@@ -12,17 +12,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Topic Model (Represents a distinct study unit/chapter) - creates database
+# Topic Model (Represents a distinct study unit/chapter) - creates one table: topic in the database
 class Topic(db.Model):
+    __tablename__ = 'topics'
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(100), nullable=False)       # e.g., "Physics"
     title = db.Column(db.String(150), nullable=False)         # e.g., "Newtonian Mechanics"
-    
-    # Spaced Repetition tracking fields for the topic
     interval = db.Column(db.Integer, default=0)               # Days until next review
     repetition = db.Column(db.Integer, default=0)             # Successful review streak
     ease_factor = db.Column(db.Float, default=2.5)            # Interval multiplier
     due_date = db.Column(db.DateTime, default=datetime.utcnow) # When it should appear on the to-do list
+
+    # Relationship to Review model: delete-orphan ensures that if a Topic is deleted, its associated Reviews are also deleted.
     reviews = db.relationship('Review', back_populates='topic', cascade='all, delete-orphan')
 
     def __repr__(self):
@@ -54,10 +55,11 @@ class Topic(db.Model):
             self.repetition += 1
         self.due_date = datetime.utcnow() + timedelta(days=self.interval)
 
-# Review Model (Represents a review session for a topic) - creates database
+# Review Database  - creates one table: reviews in the database
 class Review(db.Model):
+    __tablename__ = 'reviews'
     id = db.Column(db.Integer, primary_key=True)
-    topic_id = db.Column(db.Integer, db.ForeignKey('topic.id'), nullable=False)
+    topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)
     grade = db.Column(db.Integer, nullable=False)
     reviewed_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
