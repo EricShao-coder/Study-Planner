@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Topic Model (Represents a distinct study unit/chapter)
+# Topic Model (Represents a distinct study unit/chapter) - creates database
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(100), nullable=False)       # e.g., "Physics"
@@ -54,7 +54,7 @@ class Topic(db.Model):
             self.repetition += 1
         self.due_date = datetime.utcnow() + timedelta(days=self.interval)
 
-
+# Review Model (Represents a review session for a topic) - creates database
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     topic_id = db.Column(db.Integer, db.ForeignKey('topic.id'), nullable=False)
@@ -67,6 +67,7 @@ class Review(db.Model):
 with app.app_context():
     db.create_all()
 
+# MAIN PAGE - Displays topics due for review today, sorted by due date
 @app.route('/')
 def index():
     # Include overdue topics so missed reviews remain in the queue.
@@ -76,62 +77,7 @@ def index():
     ).all()
     return render_template('index.html', due_topics=due_topics, today=today)
 
-
-@app.route('/calendar')
-def calendar_view():
-    today = datetime.utcnow().date()
-    try:
-        year = int(request.args.get('year', today.year))
-        month = int(request.args.get('month', today.month))
-        month_start = date(year, month, 1)
-    except (TypeError, ValueError):
-        abort(400, description='Invalid calendar month.')
-
-    month_end = date(
-        year, month, calendar_module.monthrange(year, month)[1]
-    )
-    range_start = datetime.combine(month_start, datetime.min.time())
-    range_end = datetime.combine(month_end + timedelta(days=1), datetime.min.time())
-
-    due_topics = Topic.query.filter(
-        Topic.due_date >= range_start,
-        Topic.due_date < range_end,
-    ).order_by(Topic.due_date.asc()).all()
-    reviews = Review.query.filter(
-        Review.reviewed_at >= range_start,
-        Review.reviewed_at < range_end,
-    ).order_by(Review.reviewed_at.asc()).all()
-
-    due_by_date = defaultdict(list)
-    for topic in due_topics:
-        due_by_date[topic.due_date.date()].append(topic)
-
-    reviews_by_date = defaultdict(list)
-    for review in reviews:
-        reviews_by_date[review.reviewed_at.date()].append(review)
-
-    weeks = []
-    for week in calendar_module.monthcalendar(year, month):
-        days = []
-        for day_number in week:
-            day = date(year, month, day_number) if day_number else None
-            days.append(day)
-        weeks.append(days)
-
-    previous_month = month_start - timedelta(days=1)
-    next_month = month_end + timedelta(days=1)
-    return render_template(
-        'calendar.html',
-        month_name=month_start.strftime('%B %Y'),
-        weeks=weeks,
-        today=today,
-        due_by_date=due_by_date,
-        reviews_by_date=reviews_by_date,
-        previous_month=previous_month,
-        next_month=next_month,
-    )
-
-
+# When user submits a review for a topic, this route processes the review and updates the topic's spaced repetition data accordingly.
 @app.post('/topics/<int:topic_id>/review')
 def review_topic(topic_id):
     topic = db.get_or_404(Topic, topic_id)
@@ -147,6 +93,67 @@ def review_topic(topic_id):
     db.session.add(Review(topic=topic, grade=grade))
     db.session.commit()
     return redirect(url_for('index'))
+
+# CALENDAR VIEW - Displays a monthly calendar with due topics and reviews
+@app.route('/calendar')
+def calendar_view():
+    # Determine the month and year to display, defaulting to the current month if not specified in query parameters.
+    today = datetime.utcnow().date()
+    try:
+        year = int(request.args.get('year', today.year))
+        month = int(request.args.get('month', today.month))
+        month_start = date(year, month, 1)
+    except (TypeError, ValueError):
+        abort(400, description='Invalid calendar month.')
+
+    # Calculate the last day of the month and define the date range for querying due topics and reviews.
+    month_end = date(
+        year, month, calendar_module.monthrange(year, month)[1]
+    )
+    range_start = datetime.combine(month_start, datetime.min.time())
+    range_end = datetime.combine(month_end + timedelta(days=1), datetime.min.time())
+
+    # Query the database for topics due within the specified month and reviews conducted within the same range, ordering both by their respective dates.
+    due_topics = Topic.query.filter(
+        Topic.due_date >= range_start,
+        Topic.due_date < range_end,
+    ).order_by(Topic.due_date.asc()).all()
+
+    reviews = Review.query.filter(
+        Review.reviewed_at >= range_start,
+        Review.reviewed_at < range_end,
+    ).order_by(Review.reviewed_at.asc()).all()
+
+    due_by_date = defaultdict(list)
+    for topic in due_topics:
+        due_by_date[topic.due_date.date()].append(topic)
+
+    reviews_by_date = defaultdict(list)
+    for review in reviews:
+        reviews_by_date[review.reviewed_at.date()].append(review)
+
+    # Generate the calendar structure for the specified month, creating a list of weeks, each containing a list of days (with None for days outside the current month).
+    weeks = []
+    for week in calendar_module.monthcalendar(year, month):
+        days = []
+        for day_number in week:
+            day = date(year, month, day_number) if day_number else None
+            days.append(day)
+        weeks.append(days)
+
+    previous_month = month_start - timedelta(days=1)
+    next_month = month_end + timedelta(days=1)
+    
+    return render_template(
+        'calendar.html',
+        month_name=month_start.strftime('%B %Y'),
+        weeks=weeks,
+        today=today,
+        due_by_date=due_by_date,
+        reviews_by_date=reviews_by_date,
+        previous_month=previous_month,
+        next_month=next_month,
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
