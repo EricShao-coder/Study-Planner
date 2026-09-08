@@ -7,6 +7,10 @@
         <title>{% block title %}Study Planner{% endblock %}</title>
     </head>
     <body>
+        <nav class="site-nav" aria-label="Main navigation">
+            <a href="{{ url_for('index') }}">Today</a>
+            <a href="{{ url_for('calendar_view') }}">Calendar</a>
+        </nav>
         {% block content %}{% endblock %}
     </body>
 </html>

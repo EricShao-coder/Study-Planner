@@ -19,6 +19,29 @@ body {
 	font-family: Georgia, "Times New Roman", serif;
 }
 
+.site-nav {
+	display: flex;
+	justify-content: flex-end;
+	gap: 1.25rem;
+	width: min(960px, calc(100% - 2rem));
+	margin: 0 auto;
+	padding: 1.25rem 0 0;
+	font: 600 0.8rem "Trebuchet MS", sans-serif;
+}
+
+.site-nav a,
+.month-nav a {
+	color: var(--accent-dark);
+	text-decoration: none;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.month-nav a:hover,
+.month-nav a:focus-visible {
+	text-decoration: underline;
+}
+
 main {
 	width: min(760px, calc(100% - 2rem));
 	margin: 0 auto;
@@ -92,6 +115,20 @@ button {
 	cursor: pointer;
 }
 
+.review-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+}
+
+.review-actions .again {
+	background: #8b4a3d;
+}
+
+.review-actions .easy {
+	background: #35715d;
+}
+
 button:hover,
 button:focus-visible {
 	background: var(--accent-dark);
@@ -102,6 +139,116 @@ button:focus-visible {
 	margin-top: 2rem;
 }
 
+.calendar-page {
+	width: min(960px, calc(100% - 2rem));
+}
+
+.calendar-header {
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.month-nav {
+	display: flex;
+	gap: 0.85rem;
+	padding-bottom: 0.5rem;
+	font: 600 0.8rem "Trebuchet MS", sans-serif;
+}
+
+.calendar {
+	margin-top: 2rem;
+	border-top: 1px solid var(--line);
+	border-left: 1px solid var(--line);
+	background: var(--surface);
+}
+
+.weekday-row,
+.calendar-week {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.weekday {
+	padding: 0.7rem;
+	border-right: 1px solid var(--line);
+	border-bottom: 1px solid var(--line);
+	color: var(--muted);
+	font: 600 0.7rem "Trebuchet MS", sans-serif;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.calendar-day {
+	min-height: 8.5rem;
+	padding: 0.6rem;
+	border-right: 1px solid var(--line);
+	border-bottom: 1px solid var(--line);
+}
+
+.calendar-day.outside-month {
+	background: rgba(216, 221, 210, 0.25);
+}
+
+.calendar-day.today {
+	box-shadow: inset 0 3px 0 var(--accent);
+}
+
+.day-number {
+	display: block;
+	margin-bottom: 0.45rem;
+	font: 600 0.8rem "Trebuchet MS", sans-serif;
+}
+
+.calendar-item {
+	display: grid;
+	gap: 0.15rem;
+	margin-top: 0.35rem;
+	padding: 0.35rem;
+	font-size: 0.75rem;
+	line-height: 1.15;
+}
+
+.calendar-item.upcoming {
+	border-left: 3px solid var(--accent);
+	background: #f9e5dc;
+}
+
+.calendar-item.completed {
+	border-left: 3px solid #35715d;
+	background: #e1eee8;
+}
+
+.item-label {
+	font: 600 0.6rem "Trebuchet MS", sans-serif;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.calendar-key {
+	display: flex;
+	gap: 1rem;
+	margin-top: 1rem;
+	color: var(--muted);
+	font: 0.75rem "Trebuchet MS", sans-serif;
+}
+
+.key-swatch {
+	display: inline-block;
+	width: 0.65rem;
+	height: 0.65rem;
+	margin-right: 0.25rem;
+}
+
+.upcoming-swatch {
+	background: var(--accent);
+}
+
+.completed-swatch {
+	background: #35715d;
+}
+
 @media (max-width: 560px) {
 	main {
 		padding: 2.5rem 0;
@@ -110,5 +257,23 @@ button:focus-visible {
 	.topic {
 		align-items: flex-start;
 		flex-direction: column;
+	}
+
+	.calendar-header {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.calendar {
+		overflow-x: auto;
+	}
+
+	.weekday-row,
+	.calendar-week {
+		min-width: 680px;
+	}
+
+	.calendar-key {
+		padding-bottom: 1rem;
 	}
 }

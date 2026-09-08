@@ -19,8 +19,10 @@
                             <h2>{{ topic.title }}</h2>
                             <p class="meta">Review {{ topic.repetition + 1 }} · {{ topic.interval }} day interval</p>
                         </div>
-                        <form method="post" action="{{ url_for('review_topic', topic_id=topic.id) }}">
-                            <button type="submit">Mark reviewed</button>
+                        <form method="post" action="{{ url_for('review_topic', topic_id=topic.id) }}" class="review-actions">
+                            <button type="submit" name="grade" value="1" class="again">Again</button>
+                            <button type="submit" name="grade" value="3">Good</button>
+                            <button type="submit" name="grade" value="5" class="easy">Easy</button>
                         </form>
                     </article>
                 {% endfor %}
