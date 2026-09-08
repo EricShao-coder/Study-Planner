@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}Today's Study Plan{% endblock %}
+
+{% block content %}
+    <main>
+        <header>
+            <p class="eyebrow">Smart Curriculum Planner</p>
+            <h1>Today's study plan</h1>
+            <p class="summary">{{ due_topics|length }} topic{% if due_topics|length != 1 %}s{% endif %} ready for review.</p>
+        </header>
+
+        {% if due_topics %}
+            <section class="topic-list" aria-label="Topics due for review">
+                {% for topic in due_topics %}
+                    <article class="topic">
+                        <div>
+                            <p class="subject">{{ topic.subject }}</p>
+                            <h2>{{ topic.title }}</h2>
+                            <p class="meta">Review {{ topic.repetition + 1 }} · {{ topic.interval }} day interval</p>
+                        </div>
+                        <form method="post" action="{{ url_for('review_topic', topic_id=topic.id) }}">
+                            <button type="submit">Mark reviewed</button>
+                        </form>
+                    </article>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section class="empty-state">
+                <h2>Nothing due today</h2>
+                <p>Your next review will appear here when it is scheduled.</p>
+            </section>
+        {% endif %}
+    </main>
+{% endblock %} 
