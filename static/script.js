@@ -18,6 +18,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let draggedTopic = null;
 
+    function clearDragPreviews() {
+        document.querySelectorAll('.drag-preview').forEach(preview => preview.remove());
+    }
+
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function showDragPreview(target) {
+        clearDragPreviews();
+
+        const targetDate = new Date(`${target.dataset.targetDate}T00:00:00`);
+        const previewDates = [targetDate];
+        let interval = Math.max(1, Number(draggedTopic.dataset.interval) || 1);
+        const easeFactor = Number(draggedTopic.dataset.easeFactor) || 2.5;
+
+        for (let index = 0; index < 2; index += 1) {
+            const nextDate = new Date(previewDates.at(-1));
+            nextDate.setDate(nextDate.getDate() + interval);
+            previewDates.push(nextDate);
+            interval = Math.max(1, Math.round(interval * easeFactor));
+        }
+
+        previewDates.forEach((date, index) => {
+            const previewTarget = document.querySelector(
+                `.drop-target[data-target-date="${formatDate(date)}"]`
+            );
+            if (!previewTarget) {
+                return;
+            }
+
+            const preview = document.createElement('div');
+            preview.className = 'drag-preview';
+            preview.textContent = index === 0
+                ? `Move ${draggedTopic.dataset.title} here`
+                : `Future review: ${draggedTopic.dataset.title}`;
+            previewTarget.append(preview);
+        });
+    }
+
     document.querySelectorAll('.draggable-topic').forEach(topic => {
         topic.addEventListener('dragstart', event => {
             draggedTopic = topic;
@@ -29,6 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         topic.addEventListener('dragend', () => {
             topic.classList.remove('is-dragging');
             draggedTopic = null;
+            clearDragPreviews();
             document.querySelectorAll('.drop-target').forEach(target => {
                 target.classList.remove('is-drag-over');
             });
@@ -40,6 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             event.dataTransfer.dropEffect = 'move';
             target.classList.add('is-drag-over');
+            if (draggedTopic) {
+                showDragPreview(target);
+            }
         });
 
         target.addEventListener('dragleave', event => {
@@ -51,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         target.addEventListener('drop', async event => {
             event.preventDefault();
             target.classList.remove('is-drag-over');
+            clearDragPreviews();
 
             if (!draggedTopic || target.contains(draggedTopic)) {
                 return;

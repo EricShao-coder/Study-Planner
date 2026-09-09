@@ -35,13 +35,13 @@
                                 <div class="desktop-day-content">
                                     <time datetime="{{ day.isoformat() }}" class="day-number">{{ day.day }}</time>
                                     {% for topic in due_by_date.get(day, []) %}
-                                        <div class="calendar-item upcoming topic-trigger draggable-topic" draggable="true" data-topic-id="{{ topic.id }}" data-reschedule-url="{{ url_for('reschedule_topic', topic_id=topic.id) }}" data-title="{{ topic.title }}" data-subject="{{ topic.subject }}" data-review-date="{{ day.isoformat() }}" data-repetition="{{ topic.repetition }}" data-interval="{{ topic.interval }}" data-ease-factor="{{ '%.2f'|format(topic.ease_factor) }}">
+                                        <div class="calendar-item upcoming topic-trigger draggable-topic{% if day > current_week_end %} future-scheduled{% endif %}" draggable="true" data-topic-id="{{ topic.id }}" data-reschedule-url="{{ url_for('reschedule_topic', topic_id=topic.id) }}" data-title="{{ topic.title }}" data-subject="{{ topic.subject }}" data-review-date="{{ day.isoformat() }}" data-repetition="{{ topic.repetition }}" data-interval="{{ topic.interval }}" data-ease-factor="{{ '%.2f'|format(topic.ease_factor) }}">
                                             <span class="item-label">Due</span>
                                             <span>{{ topic.title }}</span>
                                         </div>
                                     {% endfor %}
                                     {% for review in reviews_by_date.get(day, []) %}
-                                        <div class="calendar-item completed topic-trigger draggable-topic" draggable="true" data-topic-id="{{ review.topic.id }}" data-reschedule-url="{{ url_for('reschedule_topic', topic_id=review.topic.id) }}" data-title="{{ review.topic.title }}" data-subject="{{ review.topic.subject }}" data-review-date="{{ day.isoformat() }}" data-repetition="{{ review.topic.repetition }}" data-interval="{{ review.topic.interval }}" data-ease-factor="{{ '%.2f'|format(review.topic.ease_factor) }}">
+                                        <div class="calendar-item completed topic-trigger draggable-topic{% if day < current_week_start %} past-reviewed{% endif %}" draggable="true" data-topic-id="{{ review.topic.id }}" data-reschedule-url="{{ url_for('reschedule_topic', topic_id=review.topic.id) }}" data-title="{{ review.topic.title }}" data-subject="{{ review.topic.subject }}" data-review-date="{{ day.isoformat() }}" data-repetition="{{ review.topic.repetition }}" data-interval="{{ review.topic.interval }}" data-ease-factor="{{ '%.2f'|format(review.topic.ease_factor) }}">
                                             <span class="item-label">Done</span>
                                             <span>{{ review.topic.title }}</span>
                                         </div>

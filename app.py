@@ -203,6 +203,8 @@ def calendar_view():
 
     previous_month = month_start - timedelta(days=1)
     next_month = month_end + timedelta(days=1)
+    current_week_start = today - timedelta(days=today.weekday())
+    current_week_end = current_week_start + timedelta(days=6)
     
     return render_template(
         'calendar.html',
@@ -211,6 +213,8 @@ def calendar_view():
         today=today,
         due_by_date=due_by_date,
         reviews_by_date=reviews_by_date,
+        current_week_start=current_week_start,
+        current_week_end=current_week_end,
         previous_month=previous_month,
         next_month=next_month,
     )

@@ -248,6 +248,33 @@ button:focus-visible {
 	opacity: 0.45;
 }
 
+.future-scheduled,
+.past-reviewed {
+	opacity: 0.35;
+}
+
+.future-scheduled:hover,
+.future-scheduled:focus-visible,
+.past-reviewed:hover,
+.past-reviewed:focus-visible,
+.future-scheduled.is-dragging,
+.past-reviewed.is-dragging {
+	opacity: 1;
+}
+
+.drag-preview {
+	position: relative;
+	z-index: 1;
+	margin-top: 0.35rem;
+	padding: 0.35rem;
+	border: 1px dashed var(--accent);
+	color: var(--accent-dark);
+	background: rgba(249, 229, 220, 0.72);
+	font: 600 0.6rem "Trebuchet MS", sans-serif;
+	line-height: 1.15;
+	pointer-events: none;
+}
+
 .drop-target.is-drag-over {
 	min-height: 100%;
 	background: #f9e5dc;
