@@ -12,6 +12,40 @@
             <p class="summary" id="live-clock">{{ today.strftime("%H:%M:%S") }}</p>
         </header>
 
+        <!-- used AI here to understand how a heatmap works and to provide a building block for me */ -->
+        <section class="consistency" aria-labelledby="consistency-title">
+            <div class="consistency-heading">
+                <div>
+                    <p class="eyebrow">Past weeks</p>
+                    <h2 id="consistency-title">Study consistency</h2>
+                </div>
+                <p class="consistency-summary">Keep the rhythm going.</p>
+            </div>
+            <div class="heatmap" aria-label="Study consistency over the past weeks">
+                <div class="heatmap-weekdays" aria-hidden="true">
+                    <span>Mon</span>
+                    <span>Wed</span>
+                    <span>Fri</span>
+                </div>
+                <div class="heatmap-grid">
+                    {% for week in heatmap_weeks %}
+                        <div class="heatmap-week">
+                            {% for day in week %}
+                                <a class="heatmap-day heatmap-{{ day.level }}" href="{{ url_for('calendar_day_view', selected_date=day.date.isoformat()) }}" aria-label="{{ day.date.strftime('%B %-d, %Y') }}: {{ day.completed }} completed, {{ day.planned }} planned" title="{{ day.date.strftime('%b %-d') }} · {{ day.completed }} completed / {{ day.planned }} planned"></a>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="heatmap-legend" aria-label="Heatmap legend">
+                <span><i class="heatmap-swatch heatmap-empty"></i>No plan</span>
+                <span><i class="heatmap-swatch heatmap-complete"></i>Complete</span>
+                <span><i class="heatmap-swatch heatmap-partial"></i>Partial</span>
+                <span><i class="heatmap-swatch heatmap-missed"></i>Missed</span>
+                <span><i class="heatmap-swatch heatmap-extra"></i>Extra study</span>
+            </div>
+        </section>
+
         {% if due_topics %}
             <section class="topic-list" aria-label="Topics due for review">
                 {% for topic in due_topics %}

@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Live Clock in index.html
     function updateTime() {
         const time = document.getElementById('live-clock');
         if (!time) {
@@ -16,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTime();
     setInterval(updateTime, 1000);
 
+    // Create draggable topic blocks in calendar view
     let draggedTopic = null;
 
     function clearDragPreviews() {
@@ -117,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Create a popup for users to manually update their topic data
     const modal = document.getElementById('my-popup');
     const topicForm = document.getElementById('topic-form');
 

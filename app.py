@@ -97,7 +97,78 @@ def index():
     ).order_by(
         Topic.due_date.asc()
     ).all()
-    return render_template('index.html', due_topics=due_topics, today=today)
+
+    today_date = today.date()
+    # 1. Expand the range to a full year (52 weeks = 364 days) like GitHub
+    total_weeks = 52
+    total_days = total_weeks * 7
+    heatmap_start = today_date - timedelta(
+        days=today_date.weekday() + ((total_weeks - 1) * 7)
+    )
+    
+    heatmap_range_start = datetime.combine(
+        heatmap_start, datetime.min.time(), tzinfo=LOCAL_TIMEZONE
+    )
+    heatmap_range_end = datetime.combine(
+        today_date + timedelta(days=1), datetime.min.time(), tzinfo=LOCAL_TIMEZONE
+    )
+    
+    heatmap_start_utc = local_datetime_to_utc_naive(heatmap_range_start)
+    heatmap_end_utc = local_datetime_to_utc_naive(heatmap_range_end)
+
+    planned_topics = Topic.query.filter(
+        Topic.due_date >= heatmap_start_utc,
+        Topic.due_date < heatmap_end_utc,
+    ).all()
+    completed_reviews = Review.query.filter(
+        Review.reviewed_at >= heatmap_start_utc,
+        Review.reviewed_at < heatmap_end_utc,
+    ).all()
+
+    planned_by_date = defaultdict(int)
+    completed_by_date = defaultdict(int)
+    for topic in planned_topics:
+        planned_by_date[utc_naive_to_local_date(topic.due_date)] += 1
+    for review in completed_reviews:
+        completed_by_date[utc_naive_to_local_date(review.reviewed_at)] += 1
+
+    heatmap_days = []
+    for offset in range(total_days):
+        current_date = heatmap_start + timedelta(days=offset)
+        planned = planned_by_date[current_date]
+        completed = completed_by_date[current_date]
+        
+        # 2. Maintain your exact task-completion status logic
+        if planned and completed >= planned:
+            level = 'complete'
+        elif planned and completed:
+            level = 'partial'
+        elif planned:
+            level = 'missed'
+        elif completed:
+            level = 'extra'
+        else:
+            level = 'empty'
+            
+        heatmap_days.append({
+            'date': current_date,
+            'planned': planned,
+            'completed': completed,
+            'level': level,
+        })
+
+    # 3. Chunk into 52 columns of 7 days each
+    heatmap_weeks = [heatmap_days[index:index + 7] for index in range(0, total_days, 7)]
+    
+    return render_template(
+        'index.html',
+        due_topics=due_topics,
+        today=today,
+        heatmap_weeks=heatmap_weeks,
+    )
+
+
+
 
 # When user submits a review for a topic, this route processes the review and updates the topic's spaced repetition data accordingly.
 @app.post('/topics/<int:topic_id>/review')
