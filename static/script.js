@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTime();
     setInterval(updateTime, 1000);
 
+    // scrolls the heatmap table all the way to the right for better user experience
+    const heatmap = document.querySelector(".heatmap");
+    if (heatmap) {
+        heatmap.scrollLeft = heatmap.scrollWidth;
+    }
+
     // Create draggable topic blocks in calendar view
     let draggedTopic = null;
 

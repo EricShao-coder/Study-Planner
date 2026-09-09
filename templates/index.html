@@ -22,11 +22,6 @@
                 <p class="consistency-summary">Keep the rhythm going.</p>
             </div>
             <div class="heatmap" aria-label="Study consistency over the past weeks">
-                <div class="heatmap-weekdays" aria-hidden="true">
-                    <span>Mon</span>
-                    <span>Wed</span>
-                    <span>Fri</span>
-                </div>
                 <div class="heatmap-grid">
                     {% for week in heatmap_weeks %}
                         <div class="heatmap-week">
@@ -35,6 +30,15 @@
                             {% endfor %}
                         </div>
                     {% endfor %}
+                </div>
+                <div class="heatmap-weekdays" aria-hidden="true">
+                    <span>Mon</span>
+                    <span>Tues</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                    <span>Sat</span>
+                    <span>Sun</span>
                 </div>
             </div>
             <div class="heatmap-legend" aria-label="Heatmap legend">
