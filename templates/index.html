@@ -6,7 +6,7 @@
     <main>
         <header>
             <script src="{{ url_for('static', filename='script.js') }}" defer></script>
-            <p class="eyebrow">Smart Curriculum Planner UTC | {{ today.strftime("%Y-%m-%d %H:%M:%S") }}</p>
+            <p class="eyebrow">Smart Curriculum Planner | {{ today.strftime("%Y-%m-%d %H:%M:%S %Z") }}</p>
             <h1>Today's study plan</h1>
             <p class="summary">{{ due_topics|length }} topic{% if due_topics|length != 1 %}s{% endif %} ready for review.</p>
             <p class="summary" id="live-clock">{{ today.strftime("%H:%M:%S") }}</p>

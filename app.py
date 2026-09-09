@@ -1,10 +1,27 @@
 import calendar as calendar_module
 from collections import defaultdict
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from flask import Flask, abort, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+LOCAL_TIMEZONE = datetime.now().astimezone().tzinfo
+
+
+def utc_now_naive():
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+def local_now():
+    return datetime.now(timezone.utc).astimezone(LOCAL_TIMEZONE)
+
+
+def local_datetime_to_utc_naive(value):
+    return value.astimezone(timezone.utc).replace(tzinfo=None)
+
+
+def utc_naive_to_local_date(value):
+    return value.replace(tzinfo=timezone.utc).astimezone(LOCAL_TIMEZONE).date()
 
 # Configure SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///study_app.db'
@@ -21,7 +38,7 @@ class Topic(db.Model):
     interval = db.Column(db.Integer, default=0)               # Days until next review
     repetition = db.Column(db.Integer, default=0)             # Successful review streak
     ease_factor = db.Column(db.Float, default=2.5)            # Interval multiplier
-    due_date = db.Column(db.DateTime, default=datetime.utcnow) # When it should appear on the to-do list
+    due_date = db.Column(db.DateTime, default=utc_now_naive) # When it should appear on the to-do list
 
     # Relationship to Review model: delete-orphan ensures that if a Topic is deleted, its associated Reviews are also deleted.
     reviews = db.relationship('Review', back_populates='topic', cascade='all, delete-orphan')
@@ -53,7 +70,7 @@ class Topic(db.Model):
             self.interval = max(1, round(self.interval * self.ease_factor))
 
             self.repetition += 1
-        self.due_date = datetime.utcnow() + timedelta(days=self.interval)
+        self.due_date = utc_now_naive() + timedelta(days=self.interval)
 
 # Review Database  - creates one table: reviews in the database
 class Review(db.Model):
@@ -61,7 +78,7 @@ class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)
     grade = db.Column(db.Integer, nullable=False)
-    reviewed_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    reviewed_at = db.Column(db.DateTime, default=utc_now_naive, nullable=False)
 
     topic = db.relationship('Topic', back_populates='reviews')
 
@@ -73,8 +90,10 @@ with app.app_context():
 @app.route('/')
 def index():
     # Include overdue topics so missed reviews remain in the queue.
-    today = datetime.utcnow()
-    due_topics = Topic.query.filter(Topic.due_date <= today).order_by(
+    today = local_now()
+    due_topics = Topic.query.filter(
+        Topic.due_date <= utc_now_naive()
+    ).order_by(
         Topic.due_date.asc()
     ).all()
     return render_template('index.html', due_topics=due_topics, today=today)
@@ -100,7 +119,7 @@ def review_topic(topic_id):
 @app.route('/calendar')
 def calendar_view():
     # Determine the month and year to display, defaulting to the current month if not specified in query parameters.
-    today = datetime.utcnow().date()
+    today = local_now().date()
     try:
         year = int(request.args.get('year', today.year))
         month = int(request.args.get('month', today.month))
@@ -112,8 +131,14 @@ def calendar_view():
     month_end = date(
         year, month, calendar_module.monthrange(year, month)[1]
     )
-    range_start = datetime.combine(month_start, datetime.min.time())
-    range_end = datetime.combine(month_end + timedelta(days=1), datetime.min.time())
+    local_range_start = datetime.combine(
+        month_start, datetime.min.time(), tzinfo=LOCAL_TIMEZONE
+    )
+    local_range_end = datetime.combine(
+        month_end + timedelta(days=1), datetime.min.time(), tzinfo=LOCAL_TIMEZONE
+    )
+    range_start = local_datetime_to_utc_naive(local_range_start)
+    range_end = local_datetime_to_utc_naive(local_range_end)
 
     # Query the database for topics due within the specified month and reviews conducted within the same range, ordering both by their respective dates.
     due_topics = Topic.query.filter(
@@ -128,11 +153,11 @@ def calendar_view():
 
     due_by_date = defaultdict(list)
     for topic in due_topics:
-        due_by_date[topic.due_date.date()].append(topic)
+        due_by_date[utc_naive_to_local_date(topic.due_date)].append(topic)
 
     reviews_by_date = defaultdict(list)
     for review in reviews:
-        reviews_by_date[review.reviewed_at.date()].append(review)
+        reviews_by_date[utc_naive_to_local_date(review.reviewed_at)].append(review)
 
     # Generate the calendar structure for the specified month, creating a list of weeks, each containing a list of days (with None for days outside the current month).
     weeks = []
