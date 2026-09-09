@@ -5,6 +5,7 @@
 {% block content %}
     <main class="calendar-page">
         <header class="calendar-header">
+            <script src="{{ url_for('static', filename='script.js') }}" defer></script>
             <div>
                 <p class="eyebrow">Study history and schedule</p>
                 <h1>{{ month_name }}</h1>
@@ -30,7 +31,7 @@
                             {% if day %}
                                 <time datetime="{{ day.isoformat() }}" class="day-number">{{ day.day }}</time>
                                 {% for topic in due_by_date.get(day, []) %}
-                                    <div class="calendar-item upcoming">
+                                    <div class="calendar-item upcoming" data-title="{{ topic.title }}">
                                         <span class="item-label">Due</span>
                                         <span>{{ topic.title }}</span>
                                     </div>
@@ -53,4 +54,9 @@
             <span><i class="key-swatch completed-swatch"></i> Completed</span>
         </div>
     </main>
+
+    <div id="my-popup" style="display: none;">
+        <h4>Event Details</h4>
+        <p id="popup-text">This is dynamic HTML inside the popup!</p>
+    </div>
 {% endblock %}

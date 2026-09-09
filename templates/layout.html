@@ -12,5 +12,6 @@
             <a href="{{ url_for('calendar_view') }}">Calendar</a>
         </nav>
         {% block content %}{% endblock %}
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
     </body>
 </html>

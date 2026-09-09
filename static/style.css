@@ -249,6 +249,28 @@ button:focus-visible {
 	background: #35715d;
 }
 
+/* Popup Styles */
+#my-popup {
+    position: fixed; /* Use 'fixed' instead of 'absolute' for reliability */
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 2000; /* Increased from 1000 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    border-radius: 4px;
+}
+
+/* Positioning helper class (you can add this too) */
+.popup-positioned {
+    position: fixed;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 2000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 @media (max-width: 560px) {
 	main {
 		padding: 2.5rem 0;
