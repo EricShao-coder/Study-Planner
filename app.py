@@ -146,7 +146,7 @@ def index():
         elif planned:
             level = 'missed'
         elif completed:
-            level = 'extra'
+            level = 'complete'
         else:
             level = 'empty'
             
