@@ -5,6 +5,7 @@
 {% block content %}
     <main class="day-page">
         <header class="day-page-header">
+            <script src="{{ url_for('static', filename='script.js') }}" defer></script>
             <div>
                 <p class="eyebrow">Daily study plan</p>
                 <h1>{{ selected_day.strftime('%B %-d, %Y') }}</h1>

@@ -16,6 +16,59 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTime();
     setInterval(updateTime, 1000);
 
+    let draggedTopic = null;
+
+    document.querySelectorAll('.draggable-topic').forEach(topic => {
+        topic.addEventListener('dragstart', event => {
+            draggedTopic = topic;
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', topic.dataset.topicId);
+            topic.classList.add('is-dragging');
+        });
+
+        topic.addEventListener('dragend', () => {
+            topic.classList.remove('is-dragging');
+            draggedTopic = null;
+            document.querySelectorAll('.drop-target').forEach(target => {
+                target.classList.remove('is-drag-over');
+            });
+        });
+    });
+
+    document.querySelectorAll('.drop-target').forEach(target => {
+        target.addEventListener('dragover', event => {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            target.classList.add('is-drag-over');
+        });
+
+        target.addEventListener('dragleave', event => {
+            if (!target.contains(event.relatedTarget)) {
+                target.classList.remove('is-drag-over');
+            }
+        });
+
+        target.addEventListener('drop', async event => {
+            event.preventDefault();
+            target.classList.remove('is-drag-over');
+
+            if (!draggedTopic || target.contains(draggedTopic)) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('target_date', target.dataset.targetDate);
+            const response = await fetch(draggedTopic.dataset.rescheduleUrl, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
+    });
+
     const modal = document.getElementById('my-popup');
     const topicForm = document.getElementById('topic-form');
 

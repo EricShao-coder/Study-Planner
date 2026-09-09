@@ -1,7 +1,7 @@
 import calendar as calendar_module
 from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
-from flask import Flask, abort, redirect, render_template, request, url_for
+from flask import Flask, abort, jsonify, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -127,7 +127,26 @@ def review_topic(topic_id):
     topic.review(grade, reviewed_at=reviewed_at)
     db.session.add(Review(topic=topic, grade=grade, reviewed_at=reviewed_at))
     db.session.commit()
+    if request.form.get('return_to') == 'calendar':
+        return redirect(url_for('calendar_view'))
     return redirect(url_for('index'))
+
+
+@app.post('/topics/<int:topic_id>/reschedule')
+def reschedule_topic(topic_id):
+    topic = db.get_or_404(Topic, topic_id)
+    target_date = request.form.get('target_date', '').strip()
+    try:
+        selected_date = date.fromisoformat(target_date)
+    except ValueError:
+        abort(400, description='A valid target date is required.')
+
+    selected_datetime = datetime.combine(
+        selected_date, datetime.min.time(), tzinfo=LOCAL_TIMEZONE
+    )
+    topic.due_date = local_datetime_to_utc_naive(selected_datetime)
+    db.session.commit()
+    return jsonify(success=True, target_date=target_date)
 
 # CALENDAR VIEW - Displays a monthly calendar with due topics and reviews
 @app.route('/calendar')

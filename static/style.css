@@ -191,13 +191,19 @@ button:focus-visible {
 	background: rgba(216, 221, 210, 0.25);
 }
 
-.calendar-day.today {
-	box-shadow: inset 0 3px 0 var(--accent);
-}
-
 .day-number {
 	display: block;
 	font: 600 1.15rem "Trebuchet MS", sans-serif;
+}
+
+.calendar-day.today .day-number {
+	display: grid;
+	place-items: center;
+	width: 2rem;
+	height: 2rem;
+	border: 2px solid var(--accent);
+	border-radius: 50%;
+	background: var(--surface);
 }
 
 .day-link {
@@ -214,6 +220,7 @@ button:focus-visible {
 
 .desktop-day-content {
 	display: block;
+	min-height: 8.5rem;
 	padding: 0.6rem;
 }
 
@@ -231,6 +238,20 @@ button:focus-visible {
 	padding: 0.35rem;
 	font-size: 0.75rem;
 	line-height: 1.15;
+}
+
+.draggable-topic {
+	cursor: grab;
+}
+
+.draggable-topic.is-dragging {
+	opacity: 0.45;
+}
+
+.drop-target.is-drag-over {
+	min-height: 100%;
+	background: #f9e5dc;
+	box-shadow: inset 0 0 0 2px var(--accent);
 }
 
 .topic-trigger {
