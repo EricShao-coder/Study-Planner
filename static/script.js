@@ -16,30 +16,52 @@ document.addEventListener('DOMContentLoaded', () => {
     updateTime();
     setInterval(updateTime, 1000);
 
-    const calendar_items = document.querySelectorAll('.calendar-item.upcoming');
-    const popup = document.getElementById('my-popup');
-    const popupText = document.getElementById('popup-text');
+    const modal = document.getElementById('my-popup');
+    const topicForm = document.getElementById('topic-form');
 
-    calendar_items.forEach(item => {
-        item.addEventListener('mouseover', function(event) {
-            // Update content dynamically based on the hovered item
-            const title = item.getAttribute('data-title');
-            popupText.textContent = `Due topic: ${title}`;
-            
-            popup.style.display = 'block';
-            popup.style.top = (event.pageY + 10) + 'px';
-            popup.style.left = (event.pageX + 10) + 'px';
-        });
+    if (!modal || !topicForm) {
+        return;
+    }
 
-        item.addEventListener('mousemove', function(event) {
-            // Optional: Make popup follow the mouse slightly while inside the item
-            popup.style.top = (event.pageY + 10) + 'px';
-            popup.style.left = (event.pageX + 10) + 'px';
-        });
+    const closeButton = document.getElementById('modal-close');
+    const dateInput = document.getElementById('review-date');
 
-        item.addEventListener('mouseout', function() {
-            popup.style.display = 'none';
+    function closeModal() {
+        modal.hidden = true;
+    }
+
+    function openModal(item) {
+        document.getElementById('modal-subject').textContent = item.dataset.subject;
+        document.getElementById('modal-title').textContent = item.dataset.title;
+        document.getElementById('modal-repetition').textContent = item.dataset.repetition;
+        document.getElementById('modal-interval').textContent = `${item.dataset.interval} days`;
+        document.getElementById('modal-ease-factor').textContent = item.dataset.easeFactor;
+        dateInput.value = item.dataset.reviewDate;
+        topicForm.action = `/topics/${item.dataset.topicId}/review`;
+        modal.hidden = false;
+        closeButton.focus();
+    }
+
+    document.querySelectorAll('.topic-trigger').forEach(item => {
+        item.addEventListener('click', () => openModal(item));
+        item.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openModal(item);
+            }
         });
+    });
+
+    closeButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', event => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !modal.hidden) {
+            closeModal();
+        }
     });
 
 });

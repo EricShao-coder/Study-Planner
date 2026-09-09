@@ -210,6 +210,16 @@ button:focus-visible {
 	line-height: 1.15;
 }
 
+.topic-trigger {
+	cursor: pointer;
+}
+
+.topic-trigger:hover,
+.topic-trigger:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 1px;
+}
+
 .calendar-item.upcoming {
 	border-left: 3px solid var(--accent);
 	background: #f9e5dc;
@@ -249,26 +259,103 @@ button:focus-visible {
 	background: #35715d;
 }
 
-/* Popup Styles */
-#my-popup {
-    position: fixed; /* Use 'fixed' instead of 'absolute' for reliability */
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    z-index: 2000; /* Increased from 1000 */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 300px;
-    border-radius: 4px;
+.modal {
+	position: fixed;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: 1rem;
+	background: rgba(23, 34, 30, 0.55);
+	z-index: 2000;
 }
 
-/* Positioning helper class (you can add this too) */
-.popup-positioned {
-    position: fixed;
-    background: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    z-index: 2000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.modal[hidden] {
+	display: none;
+}
+
+.modal-card {
+	position: relative;
+	width: min(34rem, 100%);
+	max-height: calc(100vh - 2rem);
+	overflow-y: auto;
+	padding: clamp(1.5rem, 5vw, 2.5rem);
+	border: 1px solid var(--line);
+	background: var(--surface);
+	box-shadow: 0 1rem 3rem rgba(23, 34, 30, 0.2);
+}
+
+.modal-card h2 {
+	max-width: calc(100% - 2rem);
+	margin-top: 0.35rem;
+	font-size: clamp(1.7rem, 5vw, 2.5rem);
+	line-height: 1;
+}
+
+.modal-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	color: var(--ink);
+	background: transparent;
+	font-size: 1.6rem;
+	line-height: 1;
+}
+
+.modal-close:hover,
+.modal-close:focus-visible {
+	color: white;
+	background: var(--accent);
+}
+
+.modal-details {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 0.75rem;
+	margin: 1.5rem 0;
+	padding: 1rem 0;
+	border-top: 1px solid var(--line);
+	border-bottom: 1px solid var(--line);
+	font: 0.85rem "Trebuchet MS", sans-serif;
+}
+
+.modal-details span {
+	display: grid;
+	gap: 0.2rem;
+}
+
+.modal-details strong {
+	color: var(--muted);
+	font-size: 0.65rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.modal-card label {
+	display: block;
+	margin-bottom: 0.4rem;
+	font: 600 0.8rem "Trebuchet MS", sans-serif;
+}
+
+.modal-card input[type="date"] {
+	width: 100%;
+	padding: 0.8rem;
+	border: 1px solid var(--line);
+	color: var(--ink);
+	background: white;
+	font: 1rem "Trebuchet MS", sans-serif;
+}
+
+.modal-help {
+	margin: 0.65rem 0 1rem;
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.modal-actions {
+	margin-top: 1rem;
 }
 
 @media (max-width: 560px) {
@@ -287,12 +374,38 @@ button:focus-visible {
 	}
 
 	.calendar {
-		overflow-x: auto;
+		overflow: hidden;
 	}
 
 	.weekday-row,
 	.calendar-week {
-		min-width: 680px;
+		min-width: 0;
+	}
+
+	.weekday {
+		padding: 0.45rem 0.2rem;
+		font-size: 0.58rem;
+		text-align: center;
+	}
+
+	.calendar-day {
+		min-height: 6rem;
+		padding: 0.35rem 0.2rem;
+	}
+
+	.calendar-item {
+		padding: 0.25rem;
+		font-size: 0.62rem;
+		word-break: break-word;
+	}
+
+	.item-label {
+		font-size: 0.5rem;
+	}
+
+	.modal-details {
+		gap: 0.4rem;
+		font-size: 0.75rem;
 	}
 
 	.calendar-key {

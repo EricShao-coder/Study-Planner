@@ -5,7 +5,6 @@
 {% block content %}
     <main class="calendar-page">
         <header class="calendar-header">
-            <script src="{{ url_for('static', filename='script.js') }}" defer></script>
             <div>
                 <p class="eyebrow">Study history and schedule</p>
                 <h1>{{ month_name }}</h1>
@@ -31,13 +30,27 @@
                             {% if day %}
                                 <time datetime="{{ day.isoformat() }}" class="day-number">{{ day.day }}</time>
                                 {% for topic in due_by_date.get(day, []) %}
-                                    <div class="calendar-item upcoming" data-title="{{ topic.title }}">
+                                    <div class="calendar-item upcoming topic-trigger" role="button" tabindex="0"
+                                        data-topic-id="{{ topic.id }}"
+                                        data-title="{{ topic.title }}"
+                                        data-subject="{{ topic.subject }}"
+                                        data-review-date="{{ day.isoformat() }}"
+                                        data-repetition="{{ topic.repetition }}"
+                                        data-interval="{{ topic.interval }}"
+                                        data-ease-factor="{{ '%.2f'|format(topic.ease_factor) }}">
                                         <span class="item-label">Due</span>
                                         <span>{{ topic.title }}</span>
                                     </div>
                                 {% endfor %}
                                 {% for review in reviews_by_date.get(day, []) %}
-                                    <div class="calendar-item completed">
+                                    <div class="calendar-item completed topic-trigger" role="button" tabindex="0"
+                                        data-topic-id="{{ review.topic.id }}"
+                                        data-title="{{ review.topic.title }}"
+                                        data-subject="{{ review.topic.subject }}"
+                                        data-review-date="{{ day.isoformat() }}"
+                                        data-repetition="{{ review.topic.repetition }}"
+                                        data-interval="{{ review.topic.interval }}"
+                                        data-ease-factor="{{ '%.2f'|format(review.topic.ease_factor) }}">
                                         <span class="item-label">Done</span>
                                         <span>{{ review.topic.title }}</span>
                                     </div>
@@ -55,8 +68,26 @@
         </div>
     </main>
 
-    <div id="my-popup" style="display: none;">
-        <h4>Event Details</h4>
-        <p id="popup-text">This is dynamic HTML inside the popup!</p>
+    <div id="my-popup" class="modal" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button type="button" class="modal-close" id="modal-close" aria-label="Close topic editor">&times;</button>
+            <p class="eyebrow" id="modal-subject"></p>
+            <h2 id="modal-title"></h2>
+            <div class="modal-details" aria-label="Topic details">
+                <span><strong>Reviews</strong><span id="modal-repetition"></span></span>
+                <span><strong>Interval</strong><span id="modal-interval"></span></span>
+                <span><strong>Ease</strong><span id="modal-ease-factor"></span></span>
+            </div>
+            <form id="topic-form" method="post">
+                <label for="review-date">Review date</label>
+                <input type="date" id="review-date" name="review_date" required>
+                <p class="modal-help">Choose a result and SM-2 will calculate the next review from this date.</p>
+                <div class="review-actions modal-actions">
+                    <button type="submit" name="grade" value="1" class="again">Again</button>
+                    <button type="submit" name="grade" value="3">Good</button>
+                    <button type="submit" name="grade" value="5" class="easy">Easy</button>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}

@@ -46,7 +46,7 @@ class Topic(db.Model):
     def __repr__(self):
         return f'<Topic {self.subject}: {self.title}>'
 
-    def review(self, grade):
+    def review(self, grade, reviewed_at=None):
         """Apply an SM-2 review grade and schedule the next review."""
         if grade not in {1, 3, 5}:
             raise ValueError('grade must be 1, 3, or 5')
@@ -70,7 +70,8 @@ class Topic(db.Model):
             self.interval = max(1, round(self.interval * self.ease_factor))
 
             self.repetition += 1
-        self.due_date = utc_now_naive() + timedelta(days=self.interval)
+        review_start = reviewed_at or utc_now_naive()
+        self.due_date = review_start + timedelta(days=self.interval)
 
 # Review Database  - creates one table: reviews in the database
 class Review(db.Model):
@@ -110,8 +111,21 @@ def review_topic(topic_id):
     if grade not in {1, 3, 5}:
         abort(400, description='Review grade must be 1, 3, or 5.')
 
-    topic.review(grade)
-    db.session.add(Review(topic=topic, grade=grade))
+    review_date = request.form.get('review_date', '').strip()
+    if review_date:
+        try:
+            selected_date = date.fromisoformat(review_date)
+        except ValueError:
+            abort(400, description='A valid review date is required.')
+        selected_datetime = datetime.combine(
+            selected_date, datetime.min.time(), tzinfo=LOCAL_TIMEZONE
+        )
+        reviewed_at = local_datetime_to_utc_naive(selected_datetime)
+    else:
+        reviewed_at = utc_now_naive()
+
+    topic.review(grade, reviewed_at=reviewed_at)
+    db.session.add(Review(topic=topic, grade=grade, reviewed_at=reviewed_at))
     db.session.commit()
     return redirect(url_for('index'))
 
