@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ selected_day.strftime('%B %-d, %Y') }} | Study Planner{% endblock %}
+
+{% block content %}
+    <main class="day-page">
+        <header class="day-page-header">
+            <div>
+                <p class="eyebrow">Daily study plan</p>
+                <h1>{{ selected_day.strftime('%B %-d, %Y') }}</h1>
+            </div>
+            <a href="{{ url_for('calendar_view', year=selected_day.year, month=selected_day.month) }}" class="back-link">Back to calendar</a>
+        </header>
+
+        <section class="day-section" aria-labelledby="due-heading">
+            <div class="section-heading">
+                <p class="eyebrow">Scheduled work</p>
+                <h2 id="due-heading">Topics due</h2>
+            </div>
+            {% if due_topics %}
+                <div class="topic-list">
+                    {% for topic in due_topics %}
+                        <article class="topic">
+                            <div>
+                                <p class="subject">{{ topic.subject }}</p>
+                                <h2>{{ topic.title }}</h2>
+                                <p class="meta">Review {{ topic.repetition + 1 }} · {{ topic.interval }} day interval · Ease {{ '%.2f'|format(topic.ease_factor) }}</p>
+                            </div>
+                            <form method="post" action="{{ url_for('review_topic', topic_id=topic.id) }}" class="review-actions">
+                                <input type="hidden" name="review_date" value="{{ selected_day.isoformat() }}">
+                                <button type="submit" name="grade" value="1" class="again">Again</button>
+                                <button type="submit" name="grade" value="3">Good</button>
+                                <button type="submit" name="grade" value="5" class="easy">Easy</button>
+                            </form>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <section class="empty-state">
+                    <h2>Nothing due</h2>
+                    <p>No topics are scheduled for review on this day.</p>
+                </section>
+            {% endif %}
+        </section>
+
+        {% if reviews %}
+            <section class="day-section" aria-labelledby="completed-heading">
+                <div class="section-heading">
+                    <p class="eyebrow">Study history</p>
+                    <h2 id="completed-heading">Completed reviews</h2>
+                </div>
+                <div class="topic-list completed-list">
+                    {% for review in reviews %}
+                        <article class="topic completed-topic">
+                            <div>
+                                <p class="subject">{{ review.topic.subject }}</p>
+                                <h2>{{ review.topic.title }}</h2>
+                                <p class="meta">Grade {{ review.grade }} · Next interval {{ review.topic.interval }} days</p>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </main>
+{% endblock %}

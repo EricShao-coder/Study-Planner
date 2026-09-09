@@ -182,7 +182,7 @@ button:focus-visible {
 
 .calendar-day {
 	min-height: 8.5rem;
-	padding: 0.6rem;
+	padding: 0;
 	border-right: 1px solid var(--line);
 	border-bottom: 1px solid var(--line);
 }
@@ -197,8 +197,31 @@ button:focus-visible {
 
 .day-number {
 	display: block;
-	margin-bottom: 0.45rem;
-	font: 600 0.8rem "Trebuchet MS", sans-serif;
+	font: 600 1.15rem "Trebuchet MS", sans-serif;
+}
+
+.day-link {
+	display: block;
+	min-height: 8.5rem;
+	padding: 0.8rem;
+	color: var(--ink);
+	text-decoration: none;
+}
+
+.mobile-day-link {
+	display: none;
+}
+
+.desktop-day-content {
+	display: block;
+	padding: 0.6rem;
+}
+
+.day-link:hover,
+.day-link:focus-visible {
+	background: #f9e5dc;
+	outline: 2px solid var(--accent);
+	outline-offset: -2px;
 }
 
 .calendar-item {
@@ -358,6 +381,45 @@ button:focus-visible {
 	margin-top: 1rem;
 }
 
+.day-page {
+	width: min(760px, calc(100% - 2rem));
+}
+
+.day-page-header {
+	display: flex;
+	align-items: end;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.back-link {
+	padding-bottom: 0.5rem;
+	color: var(--accent-dark);
+	font: 600 0.8rem "Trebuchet MS", sans-serif;
+	text-decoration: none;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+	text-decoration: underline;
+}
+
+.day-section {
+	margin-top: 2.5rem;
+}
+
+.section-heading {
+	margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+	margin-top: 0.35rem;
+}
+
+.completed-topic {
+	border-left: 3px solid #35715d;
+}
+
 @media (max-width: 560px) {
 	main {
 		padding: 2.5rem 0;
@@ -390,7 +452,25 @@ button:focus-visible {
 
 	.calendar-day {
 		min-height: 6rem;
-		padding: 0.35rem 0.2rem;
+		padding: 0;
+	}
+
+	.desktop-day-content {
+		display: none;
+	}
+
+	.mobile-day-link {
+		display: block;
+	}
+
+	.day-link {
+		min-height: 6rem;
+		padding: 0.5rem 0.35rem;
+	}
+
+	.day-number {
+		font-size: 1.25rem;
+		text-align: center;
 	}
 
 	.calendar-item {
@@ -406,6 +486,19 @@ button:focus-visible {
 	.modal-details {
 		gap: 0.4rem;
 		font-size: 0.75rem;
+	}
+
+	.day-page-header {
+		align-items: flex-start;
+		flex-direction: column;
+	}
+
+	.day-page-header h1 {
+		font-size: clamp(2.2rem, 12vw, 3.5rem);
+	}
+
+	.back-link {
+		padding-bottom: 0;
 	}
 
 	.calendar-key {

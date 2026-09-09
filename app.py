@@ -196,5 +196,36 @@ def calendar_view():
         next_month=next_month,
     )
 
+
+@app.route('/calendar/day/<selected_date>')
+def calendar_day_view(selected_date):
+    try:
+        selected_day = date.fromisoformat(selected_date)
+    except ValueError:
+        abort(400, description='Invalid calendar day.')
+
+    local_range_start = datetime.combine(
+        selected_day, datetime.min.time(), tzinfo=LOCAL_TIMEZONE
+    )
+    local_range_end = local_range_start + timedelta(days=1)
+    range_start = local_datetime_to_utc_naive(local_range_start)
+    range_end = local_datetime_to_utc_naive(local_range_end)
+
+    due_topics = Topic.query.filter(
+        Topic.due_date >= range_start,
+        Topic.due_date < range_end,
+    ).order_by(Topic.due_date.asc()).all()
+    reviews = Review.query.filter(
+        Review.reviewed_at >= range_start,
+        Review.reviewed_at < range_end,
+    ).order_by(Review.reviewed_at.asc()).all()
+
+    return render_template(
+        'calendar_day.html',
+        selected_day=selected_day,
+        due_topics=due_topics,
+        reviews=reviews,
+    )
+
 if __name__ == '__main__':
     app.run(debug=True)
