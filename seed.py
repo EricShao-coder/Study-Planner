@@ -3,7 +3,7 @@ from pathlib import Path
 
 from app import Topic, app, db
 
-DATA_FILE = Path(__file__).with_name("templates_data.json")
+DATA_FILE = Path(__file__).with_name("topics.json")
 
 
 def seed_topics():

@@ -3,6 +3,8 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
 from flask import Flask, abort, jsonify, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
+import os
+import json
 
 app = Flask(__name__)
 LOCAL_TIMEZONE = datetime.now().astimezone().tzinfo
@@ -320,6 +322,53 @@ def calendar_day_view(selected_date):
         due_topics=due_topics,
         reviews=reviews,
     )
+
+# LOAD NEW TOPICS FROM topics.json provided by user
+def load_topic_catalog():
+    """Reads the master topics.json catalog file."""
+    file_path = os.path.join(app.root_path, 'topics.json')
+    if os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            return json.load(f)
+    return []
+
+@app.route('/library')
+def library():
+    """Renders the topic library page grouped by subject."""
+    topics = load_topic_catalog()
+    catalog_by_subject = defaultdict(list)
+    for topic in topics:
+        catalog_by_subject[topic['subject']].append(topic)
+        
+    return render_template('library.html', catalog_by_subject=catalog_by_subject)
+
+@app.route('/add-to-queue', methods=['POST'])
+def add_to_queue():
+    """Takes a selected topic and adds it to the active DB queue for a specific date."""
+    title = request.form.get('title')
+    subject = request.form.get('subject')
+    due_date_str = request.form.get('due_date') # Expected format: YYYY-MM-DD from HTML date picker
+    
+    if not due_date_str or not title:
+        return redirect(url_for('library'))
+
+    # Convert the date string into a localized and UTC-naive datetime
+    due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+    local_due_date = datetime.combine(due_date.date(), datetime.min.time(), tzinfo=LOCAL_TIMEZONE)
+    due_date_utc = local_datetime_to_utc_naive(local_due_date)
+
+    # Save to the active database queue
+    new_topic = Topic(
+        title=title,
+        subject=subject,
+        due_date=due_date_utc
+    )
+    db.session.add(new_topic)
+    db.session.commit()
+    
+    return redirect(url_for('index'))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

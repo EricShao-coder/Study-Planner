@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block title %}Today's Study Plan{% endblock %}
+
+{% block content %}
+    <head>
+    <meta charset="UTF-8">
+    <title>Topic Library</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="site-nav">
+        <a href="{{ url_for('index') }}">← Back to Dashboard</a>
+    </nav>
+
+    <main>
+        <header>
+            <p class="eyebrow">Master Repository</p>
+            <h1>Topic Library</h1>
+            <p class="summary">Browse your available subjects below, choose a target study date, and add topics to your active queue only when you are ready.</p>
+        </header>
+
+        {% for subject, topics in catalog_by_subject.items() %}
+            <section style="margin-top: 2.5rem;">
+                <h2 style="font-size: 1.6rem; font-weight: 400; margin-bottom: 1rem; border-bottom: 1px solid var(--line); padding-bottom: 0.4rem;">
+                    {{ subject }}
+                </h2>
+                
+                <div class="topic-list">
+                    {% for topic in topics %}
+                        <div class="topic">
+                            <div>
+                                <p class="subject">{{ topic.subject }}</p>
+                                <h3 style="margin: 0.3rem 0; font-size: 1.25rem; font-weight: 400;">{{ topic.title }}</h3>
+                                <p class="meta" style="text-transform: none; font-size: 0.85rem; color: var(--muted);">{{ topic.description }}</p>
+                            </div>
+                            
+                            <form action="{{ url_for('add_to_queue') }}" method="POST" style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                                <input type="hidden" name="title" value="{{ topic.title }}">
+                                <input type="hidden" name="subject" value="{{ topic.subject }}">
+                                
+                                <input type="date" name="due_date" required style="padding: 0.6rem; border: 1px solid var(--line); color: var(--ink); background: var(--surface); font: 0.8rem 'Trebuchet MS', sans-serif;">
+                                
+                                <button type="submit">Add to Queue</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% else %}
+            <div class="empty-state" style="margin-top: 2rem;">
+                <p>Your `topics.json` file is empty or missing.</p>
+            </div>
+        {% endfor %}
+    </main>
+</body>
+{% endblock %} 
