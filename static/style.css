@@ -181,13 +181,6 @@ button:focus-visible {
 	font: 0.6rem "Trebuchet MS", sans-serif;
 }
 
-.heatmap-weekdays span:nth-child(2) {
-	grid-row: 3;
-}
-
-.heatmap-weekdays span:nth-child(3) {
-	grid-row: 5;
-}
 
 .heatmap-grid {
 	display: flex;

@@ -104,9 +104,22 @@ def index():
     # 1. Expand the range to a full year (52 weeks = 364 days) like GitHub
     total_weeks = 52
     total_days = total_weeks * 7
-    heatmap_start = today_date - timedelta(
-        days=today_date.weekday() + ((total_weeks - 1) * 7)
-    )
+    
+    # Calculate heatmap_start from this week's Monday, then go back 51 full weeks
+    # This ensures each 7-day chunk in the heatmap starts on a Monday and ends on a Sunday
+    days_since_monday_of_current_week = today_date.weekday()
+    heatmap_start = today_date - timedelta(days=days_since_monday_of_current_week + (total_weeks - 1) * 7)
+    
+    # Verify the start day is Monday (weekday should be 0)
+    if heatmap_start.weekday() != 0:
+        import sys
+        print(f"ERROR: Heatmap starts on {heatmap_start.strftime('%A')} ({heatmap_start.weekday()}), expected Monday", file=sys.stderr)
+    
+    # Print debug info to verify the calculation
+    first_week_first_day = heatmap_start
+    last_week_last_day = heatmap_start + timedelta(days=total_days - 1)
+    import sys
+    print(f"DEBUG Heatmap range: {first_week_first_day.strftime('%A, %Y-%m-%d')} to {last_week_last_day.strftime('%A, %Y-%m-%d')}", file=sys.stderr)
     
     heatmap_range_start = datetime.combine(
         heatmap_start, datetime.min.time(), tzinfo=LOCAL_TIMEZONE
