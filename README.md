@@ -1,4 +1,6 @@
 # 📚 Study Planner - Smart Curriculum System
+#### Video Demo:  [Study Planner Walkthrough](https://youtu.be/wYfj7Ym57EM)
+#### Description:
 
 A web-based study planner application that helps students organize and track their study schedule using a scientifically-proven Spaced Repetition System (SM-2 algorithm inspired by Anki). 
 
@@ -41,23 +43,22 @@ The app implements the Leitner System's SM-2 algorithm:
 
 ```
 Study Planner/
-├── app.py                 # Main Flask application
-├── seed.py               # Database seeding script
-├── topics.json           # Topic catalog configuration
-├── requirements.txt      # Python dependencies
-├── instance/             # SQLite database storage
-├── static/               # Frontend assets
-│   ├── style.css         # Stylesheet
-│   └── script.js         # JavaScript functionality
-├── templates/            # HTML templates
-│   ├── layout.html       # Base template
-│   ├── index.html        # Dashboard/Home view
-│   ├── library.html      # Topic library view
-│   ├── calendar.html     # Monthly calendar view
-│   └── calendar_day.html # Daily detail view
-├── database_management/  # Database management utilities
-│   ├── reset_database.py
-│   └── delete_database_row.py
+├── app.py            # Main Flask application
+├── seed.py                # Database seeding script
+├── reset_database.py      # Clears Tables in Database
+├── delete_database_row.py # Clears specific row in Database
+├── topics.json            # Topic catalog configuration
+├── requirements.txt       # Python dependencies
+├── instance/              # SQLite database storage
+├── static/                # Frontend assets
+│   ├── style.css          # Stylesheet
+│   └── script.js          # JavaScript functionality
+├── templates/             # HTML templates
+│   ├── layout.html        # Base template
+│   ├── index.html         # Dashboard/Home view
+│   ├── library.html       # Topic library view
+│   ├── calendar.html      # Monthly calendar view
+│   └── calendar_day.html  # Daily detail view
 └── README.md            # This file
 ```
 
@@ -67,11 +68,12 @@ Study Planner/
 - Python 3.8 or higher
 - pip (Python package manager)
 
-### Installation
+### Installation for MacOS
+For other OS, do search up relevant syntax of the commands below.
 
 1. **Navigate to the project directory:**
    ```bash
-   cd "/Users/eric/CS Projects/Study Planner"
+   cd Study\ Planner/
    ```
 
 2. **Create a virtual environment (recommended):**
@@ -106,11 +108,15 @@ Study Planner/
 
 The application uses SQLite for data persistence:
 - **Location**: `instance/study_app.db`
-- **Models**:
-  - `Topic`: Study units with subject, title, review interval, repetition count, ease factor, and due date
-  - `Review`: Individual review sessions tracking grade and timestamp
+- **SQL Tables**:
+  - `Topics`: Study units with subject, title, review interval, repetition count, ease factor, and due date
+  - `Reviews`: Individual review sessions tracking grade and timestamp
+- **Database Management**
+  - `delete_database_row.py`: Edit the table id > `topic = db.session.get(Topic, 4)` where 4 is the id from the topics table
+  - `reset_database.py`: Complete clears database without deleting table when run
 
-## 🔧 Configuration
+
+## 🔧 Loading large data files (topics)
 
 ### topics.json
 Edit this file to customize your study catalog. Each entry should have:
@@ -138,15 +144,15 @@ When reviewing a topic, you'll rate your performance:
 
 The algorithm adapts based on your performance, creating an optimal review schedule.
 
-## 🔍 Routes
+## 🔍 Website Routes
 
-| Route | Method | Description |
-|-------|--------|-------------|
-| `/` | GET | Dashboard - Today's study plan |
-| `/library` | GET | Topic library - Browse all subjects |
-| `/add-to-queue` | POST | Add a topic to the review queue |
-| `/calendar` | GET | Monthly calendar view |
-| `/calendar/day/<date>` | GET | Daily detail view |
+| Route | Description |
+|-------|-------------|
+| `/` | Dashboard - Today's study plan |
+| `/library` | Topic library - Browse all subjects |
+| `/add-to-queue` | Add a topic to the review queue |
+| `/calendar` | Monthly calendar view |
+| `/calendar/day/<date>` | Daily detail view |
 
 ## 📝 Usage Tips
 
@@ -166,7 +172,7 @@ The algorithm adapts based on your performance, creating an optimal review sched
 
 ## 📄 License
 
-This project is for personal educational use.
+This project is made as part of my CS50 Final Project only.
 
 ---
 
