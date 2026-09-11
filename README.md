@@ -1,5 +1,4 @@
 # 📚 Study Planner - Smart Curriculum System
-#### Video Demo:  [Study Planner Walkthrough](https://youtu.be/wYfj7Ym57EM)
 #### Description:
 
 A web-based study planner application that helps students organize and track their study schedule using a scientifically-proven Spaced Repetition System (SM-2 algorithm inspired by Anki). 
